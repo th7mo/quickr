@@ -7,5 +7,5 @@ name = "th7mo_quickr"
 version = "0.1.0"
 
 [[package]]
-name = "th7mo_quickr_core"
+name = "th7mo_quickr_qr"
 version = "0.1.0"

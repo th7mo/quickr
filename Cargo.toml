@@ -1,6 +1,3 @@
 [workspace]
 
-members = [
-    "th7mo_quickr",
-    "th7mo_quickr_core"
-]
+members = ["lib/*", "bin/*"]
