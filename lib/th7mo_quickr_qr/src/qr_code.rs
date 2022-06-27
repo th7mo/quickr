@@ -1,3 +1,4 @@
+use std::cmp;
 use std::ops::AddAssign;
 use crate::bit::Bit;
 
@@ -39,7 +40,7 @@ impl QRCode {
             vec![1, 0, 0, 0, 0, 0, 1],
             vec![1, 1, 1, 1, 1, 1, 1],
         ];
-        
+
     }
 
     fn build_matrix_from_binary_pattern(pattern: Vec<Vec<u8>>) -> Vec<Vec<Bit>>{
@@ -56,8 +57,9 @@ impl QRCode {
 
 impl AddAssign for QRCode {
     fn add_assign(&mut self, other: Self) {
-        for row in 0..other.size as usize {
-            for col in 0..other.size as usize {
+        let smallest_size = cmp::min(self.size, other.size) as usize;
+        for row in 0..smallest_size {
+            for col in 0..smallest_size {
                 self.bits[row][col] += other.bits[row][col];
             }
         }
