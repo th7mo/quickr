@@ -4,6 +4,15 @@ pub struct Bit {
     pub reserved: bool,
 }
 
+impl Clone for Bit {
+    fn clone(&self) -> Self {
+        Bit {
+            on: self.on,
+            reserved: self.reserved,
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct QRCode {
     version: u8,
@@ -15,21 +24,23 @@ impl QRCode {
     const VERSION_1_SIZE: u8 = 21;
 
     pub fn new(version: u8) -> Self {
+        let size = QRCode::calc_size(version);
         QRCode {
             version,
-            bits: vec![
-                vec![
-                    Bit { on: false, reserved: false },
-                    Bit { on: false, reserved: false },
-                    Bit { on: true, reserved: false },
-                ]
-            ],
-            size: QRCode::calc_size(version)
+            bits: QRCode::build_empty_matrix(size),
+            size,
         }
     }
 
     fn calc_size(version: u8) -> u8 {
         version * 4 + (QRCode::VERSION_1_SIZE - 4)
+    }
+
+    fn build_empty_matrix(size: u8) -> Vec<Vec<Bit>> {
+        let row = vec![
+            Bit { on: false, reserved: false, }; size as usize
+        ];
+        vec![row; size as usize]
     }
 }
 
@@ -133,6 +144,7 @@ mod qrcode {
 
             assert_eq!(qr_v40.bits.len(), VERSION_40_DIMENTIONS_LENGTH);
             assert_eq!(qr_v40.bits[(qr_v40.size - 1) as usize].len(), VERSION_40_DIMENTIONS_LENGTH);
+
         }
     }
 }
