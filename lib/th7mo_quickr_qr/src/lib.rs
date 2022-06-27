@@ -1,2 +1,2 @@
-mod bit;
-mod qr_code;
+pub mod bit;
+pub mod qr_code;
