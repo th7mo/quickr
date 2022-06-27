@@ -26,6 +26,7 @@ impl AddAssign for Bit {
     }
 }
 
+#[cfg(test)]
 mod tests {
     mod add_assign {
         use super::super::Bit;
