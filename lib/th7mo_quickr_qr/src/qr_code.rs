@@ -3,7 +3,6 @@ use crate::bit::Bit;
 
 #[derive(Debug)]
 pub struct QRCode {
-    version: u8,
     bits: Vec<Vec<Bit>>,
     pub size: u8,
 }
@@ -14,7 +13,6 @@ impl QRCode {
     pub fn new(version: u8) -> Self {
         let size = QRCode::calc_size(version);
         QRCode {
-            version,
             bits: QRCode::build_empty_matrix(size),
             size,
         }
