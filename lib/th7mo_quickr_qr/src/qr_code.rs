@@ -28,12 +28,36 @@ impl QRCode {
         ];
         vec![row; size as usize]
     }
+
+    fn apply_finder_patterns() {
+        let finder_pattern: Vec<Vec<u8>> = vec![
+            vec![1, 1, 1, 1, 1, 1, 1],
+            vec![1, 0, 0, 0, 0, 0, 1],
+            vec![1, 0, 1, 1, 1, 0, 1],
+            vec![1, 0, 1, 1, 1, 0, 1],
+            vec![1, 0, 1, 1, 1, 0, 1],
+            vec![1, 0, 0, 0, 0, 0, 1],
+            vec![1, 1, 1, 1, 1, 1, 1],
+        ];
+        
+    }
+
+    fn build_matrix_from_binary_pattern(pattern: Vec<Vec<u8>>) -> Vec<Vec<Bit>>{
+        pattern.into_iter().map(
+            |row| row.into_iter().map(
+                |bit| Bit {
+                    on: bit == 1,
+                    reserved: true,
+                }
+            ).collect()
+        ).collect()
+    }
 }
 
 impl AddAssign for QRCode {
     fn add_assign(&mut self, other: Self) {
-        for row in 0..self.size as usize {
-            for col in 0..self.size as usize {
+        for row in 0..other.size as usize {
+            for col in 0..other.size as usize {
                 self.bits[row][col] += other.bits[row][col];
             }
         }
