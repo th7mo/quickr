@@ -20,7 +20,7 @@ impl Copy for Bit {}
 impl AddAssign for Bit {
     fn add_assign(&mut self, other: Self) {
         *self = Bit {
-            on: self.on ^ other.on,
+            on: if self.reserved { self.on } else { self.on ^ other.on },
             reserved: self.reserved || other.reserved,
         }
     }
