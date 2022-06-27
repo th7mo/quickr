@@ -88,8 +88,8 @@ impl QRCode {
 
 impl AddAssign for QRCode {
     fn add_assign(&mut self, other: Self) {
-        for row in 0..self.bits.len() {
-            for col in 0..self.bits[row].len() {
+        for row in 0..self.size as usize {
+            for col in 0..self.size as usize {
                 self.bits[row][col] += other.bits[row][col];
             }
         }
