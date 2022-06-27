@@ -11,14 +11,14 @@ impl QRCode {
     const VERSION_1_SIZE: u8 = 21;
 
     pub fn new(version: u8) -> Self {
-        let size = QRCode::calc_size(version);
+        let size = QRCode::size(version);
         QRCode {
             bits: QRCode::build_empty_matrix(size),
             size,
         }
     }
 
-    fn calc_size(version: u8) -> u8 {
+    fn size(version: u8) -> u8 {
         version * 4 + (QRCode::VERSION_1_SIZE - 4)
     }
 
