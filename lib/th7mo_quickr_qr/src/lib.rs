@@ -8,9 +8,11 @@ pub struct Bit {
 pub struct QRCode {
     version: u8,
     bits: Vec<Vec<Bit>>,
+    pub size: u8,
 }
 
 impl QRCode {
+    const VERSION_1_SIZE: u8 = 21;
 
     pub fn new(version: u8) -> Self {
         QRCode {
@@ -22,11 +24,24 @@ impl QRCode {
                     Bit { on: true, reserved: false },
                 ]
             ],
+            size: QRCode::calc_size(version)
         }
     }
 
-    pub fn size(&self) -> u8 {
+    fn calc_size(version: u8) -> u8 {
+        version * 4 + (QRCode::VERSION_1_SIZE - 4)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::QRCode;
+
+    #[test]
+    fn should_have_size_21_for_version_1() {
         const VERSION_1_SIZE: u8 = 21;
-        return (VERSION_1_SIZE - 4) + self.version * 4;
+        let qr_v1 = QRCode::new(1);
+
+        assert_eq!(qr_v1.size, VERSION_1_SIZE);
     }
 }
