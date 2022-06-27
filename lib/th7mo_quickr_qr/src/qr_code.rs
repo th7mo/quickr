@@ -186,4 +186,42 @@ mod tests {
             assert!(!qr_1.bits[3][3].on);
         }
     }
+
+    mod build_matrix_from_binary_pattern {
+        use super::super::QRCode;
+
+        #[test]
+        fn creates_correct_matrix() {
+            let pattern: Vec<Vec<u8>> = vec![
+                vec![1, 1],
+                vec![1, 0],
+            ];
+
+            let generated_bits = QRCode::build_matrix_from_binary_pattern(pattern);
+
+            assert!(generated_bits[0][0].on);
+            assert!(generated_bits[0][1].on);
+            assert!(generated_bits[1][0].on);
+            assert!(!generated_bits[1][1].on);
+
+            for row in generated_bits {
+                for bit in row  {
+                    assert!(bit.reserved);
+                }
+            }
+        }
+
+        #[test]
+        fn creates_correct_for_one() {
+            let pattern: Vec<Vec<u8>> = vec![
+                vec![1],
+            ];
+
+            let generated_bits = QRCode::build_matrix_from_binary_pattern(pattern);
+
+            assert!(generated_bits[0][0].on);
+            assert_eq!(generated_bits.len(), 1);
+            assert_eq!(generated_bits[0].len(), 1);
+        }
+    }
 }
