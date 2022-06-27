@@ -28,7 +28,7 @@ impl AddAssign for Bit {
 
 mod tests {
     mod add_assign {
-        use crate::bit::Bit;
+        use super::super::Bit;
 
         #[test]
         fn should_add_on_bit_xor_wise() {
@@ -46,6 +46,20 @@ mod tests {
             bit += Bit {
                 on: true,
                 reserved: true,
+            };
+
+            assert!(!bit.on);
+        }
+
+        #[test]
+        fn should_not_add_bits_when_bit_reserved() {
+            let mut bit = Bit {
+                on: false,
+                reserved: true,
+            };
+            bit += Bit {
+                on: true,
+                reserved: false
             };
 
             assert!(!bit.on);
