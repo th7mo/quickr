@@ -30,8 +30,6 @@ impl QRCode {
         ];
         vec![row; size as usize]
     }
-
-
 }
 
 impl AddAssign for QRCode {
@@ -145,6 +143,23 @@ mod tests {
             assert_eq!(qr_v40.bits.len(), VERSION_40_DIMENSIONS_LENGTH);
             assert_eq!(qr_v40.bits[(qr_v40.size - 1) as usize].len(), VERSION_40_DIMENSIONS_LENGTH);
 
+        }
+    }
+
+    mod add_assign {
+        use super::super::QRCode;
+
+        #[test]
+        fn should_add_two_qr_codes_together() {
+            let mut qr_1 = QRCode::new(1);
+            qr_1.bits[3][3].on = true;
+
+            let mut qr_2 = QRCode::new(1);
+            qr_2.bits[3][3].on = true;
+
+            qr_1 += qr_2;
+
+            assert!(!qr_1.bits[3][3].on);
         }
     }
 }
