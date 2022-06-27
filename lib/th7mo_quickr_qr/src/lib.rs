@@ -1,3 +1,5 @@
+use std::ops::AddAssign;
+
 #[derive(Debug)]
 pub struct Bit {
     pub on: bool,
@@ -9,6 +11,44 @@ impl Clone for Bit {
         Bit {
             on: self.on,
             reserved: self.reserved,
+        }
+    }
+}
+
+impl Copy for Bit {}
+
+impl AddAssign for Bit {
+    fn add_assign(&mut self, other: Self) {
+        *self = Bit {
+            on: self.on ^ other.on,
+            reserved: self.reserved || other.reserved,
+        }
+    }
+}
+
+mod bit {
+    mod add_assign {
+        use super::super::Bit;
+
+        #[test]
+        fn should_add_on_bit_xor_wise() {
+            let mut bit = Bit {
+                on: false,
+                reserved: false
+            };
+            bit += Bit {
+                on: true,
+                reserved: false
+            };
+
+            assert_eq!(bit.on, true);
+
+            bit += Bit {
+                on: true,
+                reserved: true,
+            };
+
+            assert_eq!(bit.on, false);
         }
     }
 }
@@ -41,6 +81,18 @@ impl QRCode {
             Bit { on: false, reserved: false, }; size as usize
         ];
         vec![row; size as usize]
+    }
+
+
+}
+
+impl AddAssign for QRCode {
+    fn add_assign(&mut self, other: Self) {
+        for row in 0..self.bits.len() {
+            for col in 0..self.bits[row].len() {
+                self.bits[row][col] += other.bits[row][col];
+            }
+        }
     }
 }
 
