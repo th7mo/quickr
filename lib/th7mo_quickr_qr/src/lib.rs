@@ -11,6 +11,7 @@ pub struct QRCode {
 }
 
 impl QRCode {
+
     pub fn new(version: u8) -> Self {
         QRCode {
             version,
@@ -22,5 +23,10 @@ impl QRCode {
                 ]
             ],
         }
+    }
+
+    pub fn size(&self) -> u8 {
+        const VERSION_1_SIZE: u8 = 21;
+        return (VERSION_1_SIZE - 4) + self.version * 4;
     }
 }
