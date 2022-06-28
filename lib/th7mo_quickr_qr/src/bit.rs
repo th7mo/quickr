@@ -1,21 +1,10 @@
 use std::ops::AddAssign;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Bit {
     pub on: bool,
     pub reserved: bool,
 }
-
-impl Clone for Bit {
-    fn clone(&self) -> Self {
-        Bit {
-            on: self.on,
-            reserved: self.reserved,
-        }
-    }
-}
-
-impl Copy for Bit {}
 
 impl AddAssign for Bit {
     fn add_assign(&mut self, other: Self) {
