@@ -132,13 +132,14 @@ impl QRCode {
             };
         }
     }
-}
 
-impl ops::Index<usize> for QRCode {
-    type Output = Vec<Bit>;
+    fn at(&self, mut row: usize, mut col: usize) -> Bit {
+        if self.has_quiet_zone {
+            row += 4;
+            col += 4;
+        }
 
-    fn index(&self, index: usize) -> &Self::Output {
-        &self.bits[index]
+        self.bits[row][col]
     }
 }
 
@@ -291,9 +292,9 @@ mod tests {
     fn applies_correct_finder_patterns_for_version_1() {
         let qr_v1 = QRCode::new(1);
 
-        assert!(qr_v1.bits[4][24].on);
-        assert!(qr_v1.bits[6][22].on);
-        assert!(!qr_v1.bits[6][23].on);
+        assert!(qr_v1[0][24].on);
+        assert!(qr_v1[2][22].on);
+        assert!(!qr_v1[2][23].on);
     }
 
     #[test]
