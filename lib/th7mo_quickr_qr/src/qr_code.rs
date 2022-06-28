@@ -14,8 +14,8 @@ impl QRCode {
     pub fn new(version: u8) -> Self {
         let size = QRCode::size(version);
         QRCode {
-            bits: QRCode::build_empty_matrix(size),
             size,
+            bits: QRCode::build_empty_matrix(size),
         }
     }
 
@@ -30,7 +30,7 @@ impl QRCode {
         vec![row; size as usize]
     }
 
-    fn apply_finder_patterns() {
+    fn apply_finder_patterns(&self) {
         let finder_pattern: Vec<Vec<u8>> = vec![
             vec![1, 1, 1, 1, 1, 1, 1],
             vec![1, 0, 0, 0, 0, 0, 1],
@@ -41,15 +41,25 @@ impl QRCode {
             vec![1, 1, 1, 1, 1, 1, 1],
         ];
 
+        let mut finder_patterns_matrix = QRCode {
+            size: self.size,
+            bits: QRCode::build_empty_matrix(self.size),
+        };
+
+        finder_patterns_matrix += QRCode::build_qr_code_from_pattern(finder_pattern);
     }
 
-    fn build_matrix_from_binary_pattern(pattern: Vec<Vec<u8>>) -> Vec<Vec<Bit>>{
-        pattern.into_iter().map(
-            |row| row.into_iter().map(
-                |bit| Bit {
-                    on: bit == 1,
-                    reserved: true,
-                }
+    fn build_qr_code_from_pattern(pattern: Vec<Vec<u8>>) -> QRCode {
+        QRCode {
+            size: pattern.len() as u8,
+            bits: QRCode::build_matrix_from_binary_pattern(pattern),
+        }
+    }
+
+    fn build_matrix_from_binary_pattern(pattern: Vec<Vec<u8>>) -> Vec<Vec<Bit>> {
+        pattern.into_iter().map(|row|
+            row.into_iter().map(|bit|
+                Bit { on: bit == 1, reserved: true, }
             ).collect()
         ).collect()
     }
