@@ -294,9 +294,19 @@ mod tests {
         assert!(qr_v1.bits[4][24].reserved);
         assert!(qr_v1.bits[6][22].reserved);
         assert!(qr_v1.bits[6][23].reserved);
+    }
 
-        println!("{}", qr_v1);
+    #[test]
+    fn adds_timing_pattern() {
+        let qr_v1 = QRCode::new(1);
 
-        assert!(false);
+        assert!(qr_v1.bits[10][12].on);
+        assert!(qr_v1.bits[10][12].reserved);
+        assert!(qr_v1.bits[12][10].on);
+        assert!(qr_v1.bits[12][10].reserved);
+        assert!(!qr_v1.bits[10][11].on);
+        assert!(qr_v1.bits[10][11].reserved);
+        assert!(!qr_v1.bits[11][10].on);
+        assert!(qr_v1.bits[11][10].reserved);
     }
 }
