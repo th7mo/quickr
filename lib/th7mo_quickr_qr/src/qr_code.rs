@@ -10,6 +10,7 @@ pub struct QRCode {
 
 impl QRCode {
     const VERSION_1_SIZE: u8 = 21;
+    const TIMING_PATTERN_OFFSET: usize = 10;
 
     pub fn new(version: u8) -> Self {
         let size = QRCode::size(version);
@@ -108,9 +109,8 @@ impl QRCode {
     }
 
     fn apply_timing_patterns(&mut self) {
-        const TIMING_PATTERN_OFFSET: usize = 10;
-        self.apply_horizontal_timing_pattern(TIMING_PATTERN_OFFSET);
-        self.apply_vertical_timing_pattern(TIMING_PATTERN_OFFSET);
+        self.apply_horizontal_timing_pattern(QRCode::TIMING_PATTERN_OFFSET);
+        self.apply_vertical_timing_pattern(QRCode::TIMING_PATTERN_OFFSET);
     }
 
     fn apply_horizontal_timing_pattern(&mut self, row: usize) {
