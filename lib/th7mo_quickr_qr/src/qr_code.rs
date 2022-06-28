@@ -1,8 +1,10 @@
 use std::cmp;
-use std::ops::AddAssign;
+use std::fmt;
+use std::fmt::Formatter;
+use std::ops;
+
 use crate::bit::Bit;
 
-#[derive(Debug)]
 pub struct QRCode {
     bits: Vec<Vec<Bit>>,
     pub size: u8,
@@ -65,7 +67,7 @@ impl QRCode {
     }
 }
 
-impl AddAssign for QRCode {
+impl ops::AddAssign for QRCode {
     fn add_assign(&mut self, other: Self) {
         let smallest_size = cmp::min(self.size, other.size) as usize;
         for row in 0..smallest_size {
@@ -73,6 +75,19 @@ impl AddAssign for QRCode {
                 self.bits[row][col] += other.bits[row][col];
             }
         }
+    }
+}
+
+impl fmt::Display for QRCode {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        let mut buffer = String::new();
+        for row in &self.bits {
+            for bit in row {
+                buffer += if bit.on { "  " } else { "██" };
+            }
+            buffer += "\n";
+        }
+        write!(f, "{}", buffer)
     }
 }
 
