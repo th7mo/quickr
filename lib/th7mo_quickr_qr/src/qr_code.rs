@@ -43,20 +43,23 @@ impl QRCode {
         };
 
         let finder_pattern_qr_code = QRCode::build_qr_code_from_pattern(&finder_pattern);
-        finder_patterns_matrix += finder_pattern_qr_code.clone();
+        let finder_pattern_offsets = QRCode::get_finder_pattern_offsets(self.size as usize);
 
-        finder_patterns_matrix.add_with_offset(
-            finder_pattern_qr_code.clone(),
-            finder_patterns_matrix.size as usize - finder_pattern.len(), 0,
-        );
-
-        finder_patterns_matrix.add_with_offset(
-            finder_pattern_qr_code.clone(), 0,
-            finder_patterns_matrix.size as usize - finder_pattern.len(),
-        );
+        for (y_offset, x_offset) in finder_pattern_offsets {
+            finder_patterns_matrix.add_with_offset(
+                finder_pattern_qr_code.clone(),
+                x_offset, y_offset
+            );
+        }
 
         self += finder_patterns_matrix;
         self
+    }
+
+    fn get_finder_pattern_offsets(size: usize) -> [(usize, usize); 3] {
+        const FINDER_PATTERN_SIZE: usize = 7;
+        let offset = size - FINDER_PATTERN_SIZE;
+        [ (0, 0), (0, offset), (offset, 0), ]
     }
 
     fn finder_pattern() -> Vec<Vec<u8>> {
@@ -293,6 +296,8 @@ mod tests {
             assert!(qr_v1.bits[0][20].reserved);
             assert!(qr_v1.bits[2][18].reserved);
             assert!(qr_v1.bits[2][19].reserved);
+
+            println!("{}", qr_v1);
         }
     }
 }
