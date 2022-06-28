@@ -4,6 +4,7 @@ use std::ops;
 
 use crate::bit::Bit;
 
+#[derive(Clone)]
 pub struct QRCode {
     bits: Vec<Vec<Bit>>,
     pub size: u8,
@@ -41,7 +42,19 @@ impl QRCode {
             bits: QRCode::build_empty_matrix(self.size),
         };
 
-        finder_patterns_matrix += QRCode::build_qr_code_from_pattern(finder_pattern);
+        let finder_pattern_qr_code = QRCode::build_qr_code_from_pattern(&finder_pattern);
+        finder_patterns_matrix += finder_pattern_qr_code.clone();
+
+        finder_patterns_matrix.add_with_offset(
+            finder_pattern_qr_code.clone(),
+            finder_patterns_matrix.size as usize - finder_pattern.len(), 0,
+        );
+
+        finder_patterns_matrix.add_with_offset(
+            finder_pattern_qr_code.clone(), 0,
+            finder_patterns_matrix.size as usize - finder_pattern.len(),
+        );
+
         self += finder_patterns_matrix;
         self
     }
@@ -58,17 +71,26 @@ impl QRCode {
         ]
     }
 
-    fn build_qr_code_from_pattern(pattern: Vec<Vec<u8>>) -> QRCode {
-        QRCode {
-            size: pattern.len() as u8,
-            bits: QRCode::build_matrix_from_binary_pattern(pattern),
+    fn add_with_offset(&mut self, other: Self, x_offset: usize, y_offset: usize) {
+        let len = other.bits.len();
+        for row in 0..len {
+            for col in 0..len {
+                self.bits[row + y_offset][col + x_offset] += other.bits[row][col];
+            }
         }
     }
 
-    fn build_matrix_from_binary_pattern(pattern: Vec<Vec<u8>>) -> Vec<Vec<Bit>> {
+    fn build_qr_code_from_pattern(pattern: &Vec<Vec<u8>>) -> QRCode {
+        QRCode {
+            size: pattern.len() as u8,
+            bits: QRCode::build_matrix_from_binary_pattern(&pattern),
+        }
+    }
+
+    fn build_matrix_from_binary_pattern(pattern: &Vec<Vec<u8>>) -> Vec<Vec<Bit>> {
         pattern.into_iter().map(|row|
             row.into_iter().map(|bit|
-                Bit { on: bit == 1, reserved: true, }
+                Bit { on: *bit == 1, reserved: true, }
             ).collect()
         ).collect()
     }
@@ -215,6 +237,7 @@ mod tests {
 
             qr_1 += qr_2;
 
+            println!("{}", qr_1);
             assert!(!qr_1.bits[20][20].on);
         }
     }
@@ -229,7 +252,7 @@ mod tests {
                 vec![1, 0],
             ];
 
-            let generated_bits = QRCode::build_matrix_from_binary_pattern(pattern);
+            let generated_bits = QRCode::build_matrix_from_binary_pattern(&pattern);
 
             assert!(generated_bits[0][0].on);
             assert!(generated_bits[0][1].on);
@@ -249,7 +272,7 @@ mod tests {
                 vec![1],
             ];
 
-            let generated_bits = QRCode::build_matrix_from_binary_pattern(pattern);
+            let generated_bits = QRCode::build_matrix_from_binary_pattern(&pattern);
 
             assert!(generated_bits[0][0].on);
             assert_eq!(generated_bits.len(), 1);
