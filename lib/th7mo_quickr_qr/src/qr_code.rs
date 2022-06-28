@@ -33,15 +33,22 @@ impl QRCode {
         ];
         let mut matrix = vec![row; full_size];
 
-        for row in 0..full_size {
-            for col in 0..full_size {
-                if row < 4 || row > full_size - 4 || col < 4 || col > full_size - 4 {
-                    matrix[row][col].reserved = true;
+        for (y, row) in matrix.iter_mut().enumerate() {
+            for (x, bit) in row.iter_mut().enumerate() {
+                if QRCode::is_quiet_zone(y, x, full_size) {
+                    bit.reserved = true;
                 }
             }
         }
 
         matrix
+    }
+
+    fn is_quiet_zone(row: usize, col: usize, full_size: usize) -> bool {
+        row < 4 ||
+        row > full_size - 4 ||
+        col < 4 ||
+        col > full_size - 4
     }
 
     fn apply_finder_patterns(&mut self) {
@@ -269,8 +276,6 @@ mod tests {
             assert!(qr_v1.bits[4][24].reserved);
             assert!(qr_v1.bits[6][22].reserved);
             assert!(qr_v1.bits[6][23].reserved);
-
-            assert!(false)
         }
     }
 }
