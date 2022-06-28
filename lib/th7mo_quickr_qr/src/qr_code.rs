@@ -35,15 +35,11 @@ impl QRCode {
 
     fn apply_finder_patterns(mut self) -> QRCode {
         let finder_pattern = QRCode::finder_pattern();
-
-        let finder_pattern_qr_code = QRCode::build_qr_code_from_pattern(&finder_pattern);
+        let finder_pattern = QRCode::build_qr_code_from_pattern(&finder_pattern);
         let finder_pattern_offsets = QRCode::get_finder_pattern_offsets(self.size);
 
         for (y_offset, x_offset) in finder_pattern_offsets {
-            self.add_with_offset(
-                &finder_pattern_qr_code,
-                x_offset, y_offset
-            );
+            self.add(&finder_pattern, x_offset, y_offset);
         }
 
         self
@@ -67,7 +63,7 @@ impl QRCode {
         ]
     }
 
-    fn add_with_offset(&mut self, other: &Self, x_offset: usize, y_offset: usize) {
+    fn add(&mut self, other: &Self, x_offset: usize, y_offset: usize) {
         let len = other.size;
         for row in 0..len {
             for col in 0..len {
