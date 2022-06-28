@@ -16,7 +16,7 @@ impl QRCode {
         let size = QRCode::size(version);
         let mut qr_code = QRCode {
             size,
-            bits: QRCode::build_empty_matrix(size + 8),
+            bits: QRCode::build_empty_matrix(size + QRCode::QUIET_ZONE_WIDTH * 2),
         };
         qr_code.apply_finder_patterns();
         qr_code.apply_timing_patterns();
@@ -311,7 +311,5 @@ mod tests {
         assert!(qr_v1.at(6, 7).reserved);
         assert!(!qr_v1.at(7, 6).on);
         assert!(qr_v1.at(7, 6).reserved);
-
-
     }
 }
