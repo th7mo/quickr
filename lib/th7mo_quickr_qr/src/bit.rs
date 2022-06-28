@@ -1,4 +1,4 @@
-use std::ops::AddAssign;
+use std::ops;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Bit {
@@ -6,7 +6,7 @@ pub struct Bit {
     pub reserved: bool,
 }
 
-impl AddAssign for Bit {
+impl ops::AddAssign for Bit {
     fn add_assign(&mut self, other: Self) {
         *self = Bit {
             on: if self.reserved { self.on } else { self.on ^ other.on },
