@@ -45,10 +45,10 @@ impl QRCode {
     }
 
     fn is_quiet_zone(row: usize, col: usize, full_size: usize) -> bool {
-        row < 4 ||
-        row > full_size - 4 ||
-        col < 4 ||
-        col > full_size - 4
+        row < QRCode::QUIET_ZONE_WIDTH ||
+        row > full_size - QRCode::QUIET_ZONE_WIDTH ||
+        col < QRCode::QUIET_ZONE_WIDTH ||
+        col > full_size - QRCode::QUIET_ZONE_WIDTH
     }
 
     fn apply_finder_patterns(&mut self) {
