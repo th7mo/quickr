@@ -115,8 +115,9 @@ impl QRCode {
 
     fn apply_horizontal_timing_pattern(&mut self, row: usize) {
         let row = &mut self.bits[row];
-        for x in 0..row.len() {
-            row[x] += Bit {
+
+        for (x, bit) in row.iter_mut().enumerate() {
+            *bit += Bit {
                 on: x % 2 == 0,
                 reserved: true,
             };
