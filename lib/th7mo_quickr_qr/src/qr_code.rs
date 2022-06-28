@@ -36,22 +36,16 @@ impl QRCode {
     fn apply_finder_patterns(mut self) -> QRCode {
         let finder_pattern = QRCode::finder_pattern();
 
-        let mut finder_patterns_matrix = QRCode {
-            size: self.size,
-            bits: QRCode::build_empty_matrix(self.size),
-        };
-
         let finder_pattern_qr_code = QRCode::build_qr_code_from_pattern(&finder_pattern);
         let finder_pattern_offsets = QRCode::get_finder_pattern_offsets(self.size);
 
         for (y_offset, x_offset) in finder_pattern_offsets {
-            finder_patterns_matrix.add_with_offset(
+            self.add_with_offset(
                 &finder_pattern_qr_code,
                 x_offset, y_offset
             );
         }
 
-        self += finder_patterns_matrix;
         self
     }
 
