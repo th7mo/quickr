@@ -1,6 +1,4 @@
-use std::cmp;
 use std::fmt;
-use std::ops;
 
 use crate::bit::Bit;
 
@@ -85,17 +83,6 @@ impl QRCode {
                 Bit { on: *bit == 1, reserved: true, }
             ).collect()
         ).collect()
-    }
-}
-
-impl ops::AddAssign for QRCode {
-    fn add_assign(&mut self, other: Self) {
-        let smallest_size = cmp::min(self.size, other.size);
-        for row in 0..smallest_size {
-            for col in 0..smallest_size {
-                self.bits[row][col] += other.bits[row][col];
-            }
-        }
     }
 }
 
@@ -213,23 +200,6 @@ mod tests {
             assert_eq!(qr_v40.size, VERSION_40_DIMENSIONS_LENGTH);
             assert_eq!(qr_v40.bits[(qr_v40.size - 1)].len(), VERSION_40_DIMENSIONS_LENGTH);
 
-        }
-    }
-
-    mod add_assign {
-        use super::super::QRCode;
-
-        #[test]
-        fn should_add_two_qr_codes_together() {
-            let mut qr_1 = QRCode::new(1);
-            qr_1.bits[20][20].on = true;
-
-            let mut qr_2 = QRCode::new(1);
-            qr_2.bits[20][20].on = true;
-
-            qr_1 += qr_2;
-
-            assert!(!qr_1.bits[20][20].on);
         }
     }
 
