@@ -22,7 +22,7 @@ impl AddAssign for Bit {
         *self = Bit {
             on: if self.reserved { self.on } else { self.on ^ other.on },
             reserved: self.reserved || other.reserved,
-        }
+        };
     }
 }
 
@@ -60,7 +60,21 @@ mod tests {
             };
             bit += Bit {
                 on: true,
-                reserved: false
+                reserved: false,
+            };
+
+            assert!(!bit.on);
+        }
+
+        #[test]
+        fn should_not_add_bits_when_bots_bits_reserved() {
+            let mut bit = Bit {
+                on: false,
+                reserved: true,
+            };
+            bit += Bit {
+                on: true,
+                reserved: true,
             };
 
             assert!(!bit.on);
