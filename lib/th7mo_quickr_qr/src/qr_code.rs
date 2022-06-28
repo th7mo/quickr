@@ -20,6 +20,7 @@ impl QRCode {
             full_size,
         };
         qr_code.apply_finder_patterns();
+        qr_code.apply_timing_patterns();
         qr_code
     }
 
@@ -104,6 +105,31 @@ impl QRCode {
                 Bit { on: *bit == 1, reserved: true, }
             ).collect()
         ).collect()
+    }
+
+    fn apply_timing_patterns(&mut self) {
+        const TIMING_PATTERN_OFFSET: usize = 10;
+        self.apply_horizontal_timing_pattern(TIMING_PATTERN_OFFSET);
+        self.apply_vertical_timing_pattern(TIMING_PATTERN_OFFSET);
+    }
+
+    fn apply_horizontal_timing_pattern(&mut self, row: usize) {
+        let row = &mut self.bits[row];
+        for x in 0..row.len() {
+            row[x] += Bit {
+                on: x % 2 == 0,
+                reserved: true,
+            };
+        }
+    }
+
+    fn apply_vertical_timing_pattern(&mut self, col: usize) {
+        for (y, row) in self.bits.iter_mut().enumerate() {
+            row[col] += Bit {
+                on: y % 2 == 0,
+                reserved: true,
+            };
+        }
     }
 }
 
@@ -276,6 +302,10 @@ mod tests {
             assert!(qr_v1.bits[4][24].reserved);
             assert!(qr_v1.bits[6][22].reserved);
             assert!(qr_v1.bits[6][23].reserved);
+
+            println!("{}", qr_v1);
+
+            assert!(false);
         }
     }
 }
