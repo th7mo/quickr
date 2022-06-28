@@ -9,7 +9,8 @@ pub struct QRCode {
 
 impl QRCode {
     const VERSION_1_SIZE: u8 = 21;
-    const TIMING_PATTERN_OFFSET: usize = 10;
+    const TIMING_PATTERN_OFFSET: usize = 6;
+    const QUIET_ZONE_WIDTH: usize = 4;
 
     pub fn new(version: u8) -> Self {
         let size = QRCode::size(version);
@@ -110,30 +111,29 @@ impl QRCode {
     }
 
     fn apply_horizontal_timing_pattern(&mut self, row: usize) {
-        let row = &mut self.bits[row];
-
-        for (x, bit) in row.iter_mut().enumerate() {
-            *bit += Bit {
-                on: x % 2 == 0,
+        for col in 0..self.size {
+            *self.set(row, col) += Bit {
+                on: row % 2 == 0,
                 reserved: true,
             };
         }
     }
 
     fn apply_vertical_timing_pattern(&mut self, col: usize) {
-        for (y, row) in self.bits.iter_mut().enumerate() {
-            row[col] += Bit {
-                on: y % 2 == 0,
+        for row in 0..self.size {
+            *self.set(row, col) += Bit {
+                on: row % 2 == 0,
                 reserved: true,
             };
         }
     }
 
-    fn at(&self, mut row: usize, mut col: usize) -> Bit {
-        row += 4;
-        col += 4;
+    fn at(&self, row: usize, col: usize) -> &Bit {
+        &self.bits[row + QRCode::QUIET_ZONE_WIDTH][col + QRCode::QUIET_ZONE_WIDTH]
+    }
 
-        self.bits[row][col]
+    fn set(&mut self, row: usize, col: usize) -> &mut Bit {
+        &mut self.bits[row + QRCode::QUIET_ZONE_WIDTH][col + QRCode::QUIET_ZONE_WIDTH]
     }
 }
 
@@ -204,7 +204,7 @@ mod tests {
         let qr_v1 = QRCode::new(1);
 
         assert_eq!(qr_v1.size, VERSION_1_DIMENSIONS_LENGTH);
-        assert_eq!(qr_v1.bits[(qr_v1.size - 1)].len(), VERSION_1_DIMENSIONS_LENGTH);
+        assert_eq!(qr_v1.bits[(qr_v1.size - 1)].len() - 8, VERSION_1_DIMENSIONS_LENGTH);
     }
 
     #[test]
@@ -311,5 +311,7 @@ mod tests {
         assert!(qr_v1.at(6, 7).reserved);
         assert!(!qr_v1.at(7, 6).on);
         assert!(qr_v1.at(7, 6).reserved);
+
+
     }
 }
