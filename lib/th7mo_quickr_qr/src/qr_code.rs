@@ -75,7 +75,7 @@ impl QRCode {
     }
 
     fn add_with_offset(&mut self, other: Self, x_offset: usize, y_offset: usize) {
-        let len = other.bits.len();
+        let len = other.size;
         for row in 0..len {
             for col in 0..len {
                 self.bits[row + y_offset][col + x_offset] += other.bits[row][col];
@@ -181,7 +181,7 @@ mod tests {
 
             let qr_v1 = QRCode::new(1);
 
-            assert_eq!(qr_v1.bits.len(), VERSION_1_DIMENSIONS_LENGTH);
+            assert_eq!(qr_v1.size, VERSION_1_DIMENSIONS_LENGTH);
             assert_eq!(qr_v1.bits[(qr_v1.size - 1)].len(), VERSION_1_DIMENSIONS_LENGTH);
         }
 
@@ -191,7 +191,7 @@ mod tests {
 
             let qr_v2 = QRCode::new(2);
 
-            assert_eq!(qr_v2.bits.len(), VERSION_2_DIMENSIONS_LENGTH);
+            assert_eq!(qr_v2.size, VERSION_2_DIMENSIONS_LENGTH);
             assert_eq!(qr_v2.bits[(qr_v2.size - 1)].len(), VERSION_2_DIMENSIONS_LENGTH);
         }
 
@@ -201,7 +201,7 @@ mod tests {
 
             let qr_v10 = QRCode::new(10);
 
-            assert_eq!(qr_v10.bits.len(), VERSION_10_DIMENSIONS_LENGTH);
+            assert_eq!(qr_v10.size, VERSION_10_DIMENSIONS_LENGTH);
             assert_eq!(qr_v10.bits[(qr_v10.size - 1)].len(), VERSION_10_DIMENSIONS_LENGTH);
         }
 
@@ -211,7 +211,7 @@ mod tests {
 
             let qr_v25 = QRCode::new(25);
 
-            assert_eq!(qr_v25.bits.len(), VERSION_25_DIMENSIONS_LENGTH);
+            assert_eq!(qr_v25.size, VERSION_25_DIMENSIONS_LENGTH);
             assert_eq!(qr_v25.bits[(qr_v25.size - 1)].len(), VERSION_25_DIMENSIONS_LENGTH);
         }
 
@@ -221,7 +221,7 @@ mod tests {
 
             let qr_v40 = QRCode::new(40);
 
-            assert_eq!(qr_v40.bits.len(), VERSION_40_DIMENSIONS_LENGTH);
+            assert_eq!(qr_v40.size, VERSION_40_DIMENSIONS_LENGTH);
             assert_eq!(qr_v40.bits[(qr_v40.size - 1)].len(), VERSION_40_DIMENSIONS_LENGTH);
 
         }
