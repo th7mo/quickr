@@ -12,12 +12,12 @@ impl QRCode {
 
     pub fn new(version: u8) -> Self {
         let size = QRCode::size(version);
-        let qr_code = QRCode {
+        let mut qr_code = QRCode {
             size,
             bits: QRCode::build_empty_matrix(size),
         };
-        qr_code.apply_finder_patterns()
-
+        qr_code.apply_finder_patterns();
+        qr_code
     }
 
     fn size(version: u8) -> usize {
@@ -31,7 +31,7 @@ impl QRCode {
         vec![row; size]
     }
 
-    fn apply_finder_patterns(mut self) -> QRCode {
+    fn apply_finder_patterns(&mut self) {
         let finder_pattern = QRCode::finder_pattern();
         let finder_pattern = QRCode::build_qr_code_from_pattern(&finder_pattern);
         let finder_pattern_offsets = QRCode::get_finder_pattern_offsets(self.size);
@@ -39,8 +39,6 @@ impl QRCode {
         for (y_offset, x_offset) in finder_pattern_offsets {
             self.add(&finder_pattern, x_offset, y_offset);
         }
-
-        self
     }
 
     fn get_finder_pattern_offsets(size: usize) -> [(usize, usize); 3] {
