@@ -1,11 +1,9 @@
 use std::fmt;
-use std::ops;
 
 use crate::bit::Bit;
 
 pub struct QRCode {
     pub size: usize,
-    has_quiet_zone: bool,
     bits: Vec<Vec<Bit>>,
 }
 
@@ -18,7 +16,6 @@ impl QRCode {
         let mut qr_code = QRCode {
             size,
             bits: QRCode::build_empty_matrix(size + 8),
-            has_quiet_zone: true,
         };
         qr_code.apply_finder_patterns();
         qr_code.apply_timing_patterns();
@@ -96,7 +93,6 @@ impl QRCode {
         QRCode {
             size: pattern.len(),
             bits: QRCode::build_matrix_from_binary_pattern(pattern),
-            has_quiet_zone: false,
         }
     }
 
@@ -134,10 +130,8 @@ impl QRCode {
     }
 
     fn at(&self, mut row: usize, mut col: usize) -> Bit {
-        if self.has_quiet_zone {
-            row += 4;
-            col += 4;
-        }
+        row += 4;
+        col += 4;
 
         self.bits[row][col]
     }
@@ -292,30 +286,30 @@ mod tests {
     fn applies_correct_finder_patterns_for_version_1() {
         let qr_v1 = QRCode::new(1);
 
-        assert!(qr_v1[0][24].on);
-        assert!(qr_v1[2][22].on);
-        assert!(!qr_v1[2][23].on);
+        assert!(qr_v1.at(0, 20).on);
+        assert!(qr_v1.at(2, 18).on);
+        assert!(!qr_v1.at(2, 19).on);
     }
 
     #[test]
     fn reserves_bits_of_finder_pattern() {
         let qr_v1 = QRCode::new(1);
-        assert!(qr_v1.bits[4][24].reserved);
-        assert!(qr_v1.bits[6][22].reserved);
-        assert!(qr_v1.bits[6][23].reserved);
+        assert!(qr_v1.at(4, 20).reserved);
+        assert!(qr_v1.at(2, 18).reserved);
+        assert!(qr_v1.at(2, 19).reserved);
     }
 
     #[test]
     fn adds_timing_pattern() {
         let qr_v1 = QRCode::new(1);
 
-        assert!(qr_v1.bits[10][12].on);
-        assert!(qr_v1.bits[10][12].reserved);
-        assert!(qr_v1.bits[12][10].on);
-        assert!(qr_v1.bits[12][10].reserved);
-        assert!(!qr_v1.bits[10][11].on);
-        assert!(qr_v1.bits[10][11].reserved);
-        assert!(!qr_v1.bits[11][10].on);
-        assert!(qr_v1.bits[11][10].reserved);
+        assert!(qr_v1.at(6, 8).on);
+        assert!(qr_v1.at(6, 8).reserved);
+        assert!(qr_v1.at(8, 6).on);
+        assert!(qr_v1.at(8, 6).reserved);
+        assert!(!qr_v1.at(6, 7).on);
+        assert!(qr_v1.at(6, 7).reserved);
+        assert!(!qr_v1.at(7, 6).on);
+        assert!(qr_v1.at(7, 6).reserved);
     }
 }
