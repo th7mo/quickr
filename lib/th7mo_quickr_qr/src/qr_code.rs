@@ -4,7 +4,6 @@ use std::ops;
 
 use crate::bit::Bit;
 
-#[derive(Clone)]
 pub struct QRCode {
     bits: Vec<Vec<Bit>>,
     pub size: usize,
@@ -47,7 +46,7 @@ impl QRCode {
 
         for (y_offset, x_offset) in finder_pattern_offsets {
             finder_patterns_matrix.add_with_offset(
-                finder_pattern_qr_code.clone(),
+                &finder_pattern_qr_code,
                 x_offset, y_offset
             );
         }
@@ -74,7 +73,7 @@ impl QRCode {
         ]
     }
 
-    fn add_with_offset(&mut self, other: Self, x_offset: usize, y_offset: usize) {
+    fn add_with_offset(&mut self, other: &Self, x_offset: usize, y_offset: usize) {
         let len = other.size;
         for row in 0..len {
             for col in 0..len {
@@ -83,16 +82,16 @@ impl QRCode {
         }
     }
 
-    fn build_qr_code_from_pattern(pattern: &Vec<Vec<u8>>) -> QRCode {
+    fn build_qr_code_from_pattern(pattern: &[Vec<u8>]) -> QRCode {
         QRCode {
             size: pattern.len(),
-            bits: QRCode::build_matrix_from_binary_pattern(&pattern),
+            bits: QRCode::build_matrix_from_binary_pattern(pattern),
         }
     }
 
-    fn build_matrix_from_binary_pattern(pattern: &Vec<Vec<u8>>) -> Vec<Vec<Bit>> {
-        pattern.into_iter().map(|row|
-            row.into_iter().map(|bit|
+    fn build_matrix_from_binary_pattern(pattern: &[Vec<u8>]) -> Vec<Vec<Bit>> {
+        pattern.iter().map(|row|
+            row.iter().map(|bit|
                 Bit { on: *bit == 1, reserved: true, }
             ).collect()
         ).collect()
