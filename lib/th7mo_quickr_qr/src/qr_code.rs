@@ -1,6 +1,5 @@
 use std::cmp;
 use std::fmt;
-use std::fmt::Formatter;
 use std::ops;
 
 use crate::bit::Bit;
@@ -79,7 +78,7 @@ impl ops::AddAssign for QRCode {
 }
 
 impl fmt::Display for QRCode {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut buffer = String::new();
         for row in &self.bits {
             for bit in row {
