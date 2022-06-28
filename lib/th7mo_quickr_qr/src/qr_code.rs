@@ -237,7 +237,6 @@ mod tests {
 
             qr_1 += qr_2;
 
-            println!("{}", qr_1);
             assert!(!qr_1.bits[20][20].on);
         }
     }
