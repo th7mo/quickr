@@ -1,10 +1,11 @@
 use std::fmt;
+use std::ops;
 
 use crate::bit::Bit;
 
 pub struct QRCode {
     pub size: usize,
-    full_size: usize,
+    has_quiet_zone: bool,
     bits: Vec<Vec<Bit>>,
 }
 
@@ -14,11 +15,10 @@ impl QRCode {
 
     pub fn new(version: u8) -> Self {
         let size = QRCode::size(version);
-        let full_size = size + 8;
         let mut qr_code = QRCode {
             size,
-            bits: QRCode::build_empty_matrix(full_size),
-            full_size,
+            bits: QRCode::build_empty_matrix(size + 8),
+            has_quiet_zone: true,
         };
         qr_code.apply_finder_patterns();
         qr_code.apply_timing_patterns();
@@ -95,8 +95,8 @@ impl QRCode {
     fn build_qr_code_from_pattern(pattern: &[Vec<u8>]) -> QRCode {
         QRCode {
             size: pattern.len(),
-            full_size: pattern.len() + 8,
             bits: QRCode::build_matrix_from_binary_pattern(pattern),
+            has_quiet_zone: false,
         }
     }
 
@@ -131,6 +131,14 @@ impl QRCode {
                 reserved: true,
             };
         }
+    }
+}
+
+impl ops::Index<usize> for QRCode {
+    type Output = Vec<Bit>;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.bits[index]
     }
 }
 
@@ -201,7 +209,7 @@ mod tests {
         let qr_v1 = QRCode::new(1);
 
         assert_eq!(qr_v1.size, VERSION_1_DIMENSIONS_LENGTH);
-        assert_eq!(qr_v1.bits[(qr_v1.full_size - 1)].len() - 8, VERSION_1_DIMENSIONS_LENGTH);
+        assert_eq!(qr_v1.bits[(qr_v1.size - 1)].len(), VERSION_1_DIMENSIONS_LENGTH);
     }
 
     #[test]
@@ -211,7 +219,7 @@ mod tests {
         let qr_v2 = QRCode::new(2);
 
         assert_eq!(qr_v2.size, VERSION_2_DIMENSIONS_LENGTH);
-        assert_eq!(qr_v2.bits[(qr_v2.full_size - 1)].len() - 8, VERSION_2_DIMENSIONS_LENGTH);
+        assert_eq!(qr_v2.bits[(qr_v2.size - 1)].len() - 8, VERSION_2_DIMENSIONS_LENGTH);
     }
 
     #[test]
@@ -221,7 +229,7 @@ mod tests {
         let qr_v10 = QRCode::new(10);
 
         assert_eq!(qr_v10.size, VERSION_10_DIMENSIONS_LENGTH);
-        assert_eq!(qr_v10.bits[(qr_v10.full_size - 1)].len() - 8, VERSION_10_DIMENSIONS_LENGTH);
+        assert_eq!(qr_v10.bits[(qr_v10.size - 1)].len() - 8, VERSION_10_DIMENSIONS_LENGTH);
     }
 
     #[test]
@@ -231,7 +239,7 @@ mod tests {
         let qr_v25 = QRCode::new(25);
 
         assert_eq!(qr_v25.size, VERSION_25_DIMENSIONS_LENGTH);
-        assert_eq!(qr_v25.bits[(qr_v25.full_size - 1)].len() - 8, VERSION_25_DIMENSIONS_LENGTH);
+        assert_eq!(qr_v25.bits[(qr_v25.size - 1)].len() - 8, VERSION_25_DIMENSIONS_LENGTH);
     }
 
     #[test]
@@ -241,7 +249,7 @@ mod tests {
         let qr_v40 = QRCode::new(40);
 
         assert_eq!(qr_v40.size, VERSION_40_DIMENSIONS_LENGTH);
-        assert_eq!(qr_v40.bits[(qr_v40.full_size - 1)].len() - 8, VERSION_40_DIMENSIONS_LENGTH);
+        assert_eq!(qr_v40.bits[(qr_v40.size - 1)].len() - 8, VERSION_40_DIMENSIONS_LENGTH);
 
     }
 
