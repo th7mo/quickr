@@ -277,5 +277,14 @@ mod tests {
             assert_eq!(generated_bits.len(), 1);
             assert_eq!(generated_bits[0].len(), 1);
         }
+
+        #[test]
+        fn applies_correct_finder_patterns_for_version_1() {
+            let qr_v1 = QRCode::new(1);
+
+            assert!(qr_v1.bits[0][20].on);
+            assert!(qr_v1.bits[2][18].on);
+            assert!(!qr_v1.bits[2][19].on);
+        }
     }
 }
