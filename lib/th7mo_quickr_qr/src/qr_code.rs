@@ -3,8 +3,9 @@ use std::fmt;
 use crate::bit::Bit;
 
 pub struct QRCode {
-    bits: Vec<Vec<Bit>>,
     pub size: usize,
+    full_size: usize,
+    bits: Vec<Vec<Bit>>,
 }
 
 impl QRCode {
@@ -12,9 +13,11 @@ impl QRCode {
 
     pub fn new(version: u8) -> Self {
         let size = QRCode::size(version);
+        let full_size = size + 8;
         let mut qr_code = QRCode {
             size,
-            bits: QRCode::build_empty_matrix(size),
+            bits: QRCode::build_empty_matrix(full_size),
+            full_size,
         };
         qr_code.apply_finder_patterns();
         qr_code
@@ -24,11 +27,21 @@ impl QRCode {
         (version * 4 + (QRCode::VERSION_1_SIZE - 4)) as usize
     }
 
-    fn build_empty_matrix(size: usize) -> Vec<Vec<Bit>> {
+    fn build_empty_matrix(full_size: usize) -> Vec<Vec<Bit>> {
         let row = vec![
-            Bit { on: false, reserved: false, }; size
+            Bit { on: false, reserved: false, }; full_size
         ];
-        vec![row; size]
+        let mut matrix = vec![row; full_size];
+
+        for row in 0..full_size {
+            for col in 0..full_size {
+                if row < 4 || row > full_size - 4 || col < 4 || col > full_size - 4 {
+                    matrix[row][col].reserved = true;
+                }
+            }
+        }
+
+        matrix
     }
 
     fn apply_finder_patterns(&mut self) {
@@ -44,18 +57,20 @@ impl QRCode {
     fn get_finder_pattern_offsets(size: usize) -> [(usize, usize); 3] {
         const FINDER_PATTERN_SIZE: usize = 7;
         let offset = size - FINDER_PATTERN_SIZE;
-        [ (0, 0), (0, offset), (offset, 0), ]
+        [ (3, 3), (3, offset + 3), (offset + 3, 3), ]
     }
 
     fn finder_pattern() -> Vec<Vec<u8>> {
         vec![
-            vec![1, 1, 1, 1, 1, 1, 1],
-            vec![1, 0, 0, 0, 0, 0, 1],
-            vec![1, 0, 1, 1, 1, 0, 1],
-            vec![1, 0, 1, 1, 1, 0, 1],
-            vec![1, 0, 1, 1, 1, 0, 1],
-            vec![1, 0, 0, 0, 0, 0, 1],
-            vec![1, 1, 1, 1, 1, 1, 1],
+            vec![0, 0, 0, 0, 0, 0, 0, 0, 0],
+            vec![0, 1, 1, 1, 1, 1, 1, 1, 0],
+            vec![0, 1, 0, 0, 0, 0, 0, 1, 0],
+            vec![0, 1, 0, 1, 1, 1, 0, 1, 0],
+            vec![0, 1, 0, 1, 1, 1, 0, 1, 0],
+            vec![0, 1, 0, 1, 1, 1, 0, 1, 0],
+            vec![0, 1, 0, 0, 0, 0, 0, 1, 0],
+            vec![0, 1, 1, 1, 1, 1, 1, 1, 0],
+            vec![0, 0, 0, 0, 0, 0, 0, 0, 0],
         ]
     }
 
@@ -71,6 +86,7 @@ impl QRCode {
     fn build_qr_code_from_pattern(pattern: &[Vec<u8>]) -> QRCode {
         QRCode {
             size: pattern.len(),
+            full_size: pattern.len() + 8,
             bits: QRCode::build_matrix_from_binary_pattern(pattern),
         }
     }
@@ -156,7 +172,7 @@ mod tests {
             let qr_v1 = QRCode::new(1);
 
             assert_eq!(qr_v1.size, VERSION_1_DIMENSIONS_LENGTH);
-            assert_eq!(qr_v1.bits[(qr_v1.size - 1)].len(), VERSION_1_DIMENSIONS_LENGTH);
+            assert_eq!(qr_v1.bits[(qr_v1.full_size - 1)].len() - 8, VERSION_1_DIMENSIONS_LENGTH);
         }
 
         #[test]
@@ -166,7 +182,7 @@ mod tests {
             let qr_v2 = QRCode::new(2);
 
             assert_eq!(qr_v2.size, VERSION_2_DIMENSIONS_LENGTH);
-            assert_eq!(qr_v2.bits[(qr_v2.size - 1)].len(), VERSION_2_DIMENSIONS_LENGTH);
+            assert_eq!(qr_v2.bits[(qr_v2.full_size - 1)].len() - 8, VERSION_2_DIMENSIONS_LENGTH);
         }
 
         #[test]
@@ -176,7 +192,7 @@ mod tests {
             let qr_v10 = QRCode::new(10);
 
             assert_eq!(qr_v10.size, VERSION_10_DIMENSIONS_LENGTH);
-            assert_eq!(qr_v10.bits[(qr_v10.size - 1)].len(), VERSION_10_DIMENSIONS_LENGTH);
+            assert_eq!(qr_v10.bits[(qr_v10.full_size - 1)].len() - 8, VERSION_10_DIMENSIONS_LENGTH);
         }
 
         #[test]
@@ -186,7 +202,7 @@ mod tests {
             let qr_v25 = QRCode::new(25);
 
             assert_eq!(qr_v25.size, VERSION_25_DIMENSIONS_LENGTH);
-            assert_eq!(qr_v25.bits[(qr_v25.size - 1)].len(), VERSION_25_DIMENSIONS_LENGTH);
+            assert_eq!(qr_v25.bits[(qr_v25.full_size - 1)].len() - 8, VERSION_25_DIMENSIONS_LENGTH);
         }
 
         #[test]
@@ -196,7 +212,7 @@ mod tests {
             let qr_v40 = QRCode::new(40);
 
             assert_eq!(qr_v40.size, VERSION_40_DIMENSIONS_LENGTH);
-            assert_eq!(qr_v40.bits[(qr_v40.size - 1)].len(), VERSION_40_DIMENSIONS_LENGTH);
+            assert_eq!(qr_v40.bits[(qr_v40.full_size - 1)].len() - 8, VERSION_40_DIMENSIONS_LENGTH);
 
         }
     }
@@ -242,17 +258,19 @@ mod tests {
         fn applies_correct_finder_patterns_for_version_1() {
             let qr_v1 = QRCode::new(1);
 
-            assert!(qr_v1.bits[0][20].on);
-            assert!(qr_v1.bits[2][18].on);
-            assert!(!qr_v1.bits[2][19].on);
+            assert!(qr_v1.bits[4][24].on);
+            assert!(qr_v1.bits[6][22].on);
+            assert!(!qr_v1.bits[6][23].on);
         }
 
         #[test]
         fn reserves_bits_of_finder_pattern() {
             let qr_v1 = QRCode::new(1);
-            assert!(qr_v1.bits[0][20].reserved);
-            assert!(qr_v1.bits[2][18].reserved);
-            assert!(qr_v1.bits[2][19].reserved);
+            assert!(qr_v1.bits[4][24].reserved);
+            assert!(qr_v1.bits[6][22].reserved);
+            assert!(qr_v1.bits[6][23].reserved);
+
+            assert!(false)
         }
     }
 }
