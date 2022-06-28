@@ -286,5 +286,13 @@ mod tests {
             assert!(qr_v1.bits[2][18].on);
             assert!(!qr_v1.bits[2][19].on);
         }
+
+        #[test]
+        fn reserves_bits_of_finder_pattern() {
+            let qr_v1 = QRCode::new(1);
+            assert!(qr_v1.bits[0][20].reserved);
+            assert!(qr_v1.bits[2][18].reserved);
+            assert!(qr_v1.bits[2][19].reserved);
+        }
     }
 }
