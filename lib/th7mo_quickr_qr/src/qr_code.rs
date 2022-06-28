@@ -14,10 +14,12 @@ impl QRCode {
 
     pub fn new(version: u8) -> Self {
         let size = QRCode::size(version);
-        QRCode {
+        let qr_code = QRCode {
             size,
             bits: QRCode::build_empty_matrix(size),
-        }
+        };
+        qr_code.apply_finder_patterns()
+
     }
 
     fn size(version: u8) -> u8 {
@@ -31,7 +33,7 @@ impl QRCode {
         vec![row; size as usize]
     }
 
-    fn apply_finder_patterns(&self) {
+    fn apply_finder_patterns(mut self) -> QRCode {
         let finder_pattern: Vec<Vec<u8>> = vec![
             vec![1, 1, 1, 1, 1, 1, 1],
             vec![1, 0, 0, 0, 0, 0, 1],
@@ -48,6 +50,8 @@ impl QRCode {
         };
 
         finder_patterns_matrix += QRCode::build_qr_code_from_pattern(finder_pattern);
+        self += finder_patterns_matrix;
+        self
     }
 
     fn build_qr_code_from_pattern(pattern: Vec<Vec<u8>>) -> QRCode {
@@ -200,14 +204,14 @@ mod tests {
         #[test]
         fn should_add_two_qr_codes_together() {
             let mut qr_1 = QRCode::new(1);
-            qr_1.bits[3][3].on = true;
+            qr_1.bits[20][20].on = true;
 
             let mut qr_2 = QRCode::new(1);
-            qr_2.bits[3][3].on = true;
+            qr_2.bits[20][20].on = true;
 
             qr_1 += qr_2;
 
-            assert!(!qr_1.bits[3][3].on);
+            assert!(!qr_1.bits[20][20].on);
         }
     }
 
