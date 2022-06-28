@@ -17,56 +17,54 @@ impl ops::AddAssign for Bit {
 
 #[cfg(test)]
 mod tests {
-    mod add_assign {
-        use super::super::Bit;
+    use super::Bit;
 
-        #[test]
-        fn should_add_on_bit_xor_wise() {
-            let mut bit = Bit {
-                on: false,
-                reserved: false
-            };
-            bit += Bit {
-                on: true,
-                reserved: false
-            };
+    #[test]
+    fn should_add_on_bit_xor_wise() {
+        let mut bit = Bit {
+            on: false,
+            reserved: false
+        };
+        bit += Bit {
+            on: true,
+            reserved: false
+        };
 
-            assert!(bit.on);
+        assert!(bit.on);
 
-            bit += Bit {
-                on: true,
-                reserved: true,
-            };
+        bit += Bit {
+            on: true,
+            reserved: true,
+        };
 
-            assert!(!bit.on);
-        }
+        assert!(!bit.on);
+    }
 
-        #[test]
-        fn should_not_add_bits_when_bit_reserved() {
-            let mut bit = Bit {
-                on: false,
-                reserved: true,
-            };
-            bit += Bit {
-                on: true,
-                reserved: false,
-            };
+    #[test]
+    fn should_not_add_bits_when_bit_reserved() {
+        let mut bit = Bit {
+            on: false,
+            reserved: true,
+        };
+        bit += Bit {
+            on: true,
+            reserved: false,
+        };
 
-            assert!(!bit.on);
-        }
+        assert!(!bit.on);
+    }
 
-        #[test]
-        fn should_not_add_bits_when_bots_bits_reserved() {
-            let mut bit = Bit {
-                on: false,
-                reserved: true,
-            };
-            bit += Bit {
-                on: true,
-                reserved: true,
-            };
+    #[test]
+    fn should_not_add_bits_when_bots_bits_reserved() {
+        let mut bit = Bit {
+            on: false,
+            reserved: true,
+        };
+        bit += Bit {
+            on: true,
+            reserved: true,
+        };
 
-            assert!(!bit.on);
-        }
+        assert!(!bit.on);
     }
 }
