@@ -34,15 +34,7 @@ impl QRCode {
     }
 
     fn apply_finder_patterns(mut self) -> QRCode {
-        let finder_pattern: Vec<Vec<u8>> = vec![
-            vec![1, 1, 1, 1, 1, 1, 1],
-            vec![1, 0, 0, 0, 0, 0, 1],
-            vec![1, 0, 1, 1, 1, 0, 1],
-            vec![1, 0, 1, 1, 1, 0, 1],
-            vec![1, 0, 1, 1, 1, 0, 1],
-            vec![1, 0, 0, 0, 0, 0, 1],
-            vec![1, 1, 1, 1, 1, 1, 1],
-        ];
+        let finder_pattern = QRCode::finder_pattern();
 
         let mut finder_patterns_matrix = QRCode {
             size: self.size,
@@ -52,6 +44,18 @@ impl QRCode {
         finder_patterns_matrix += QRCode::build_qr_code_from_pattern(finder_pattern);
         self += finder_patterns_matrix;
         self
+    }
+
+    fn finder_pattern() -> Vec<Vec<u8>> {
+        vec![
+            vec![1, 1, 1, 1, 1, 1, 1],
+            vec![1, 0, 0, 0, 0, 0, 1],
+            vec![1, 0, 1, 1, 1, 0, 1],
+            vec![1, 0, 1, 1, 1, 0, 1],
+            vec![1, 0, 1, 1, 1, 0, 1],
+            vec![1, 0, 0, 0, 0, 0, 1],
+            vec![1, 1, 1, 1, 1, 1, 1],
+        ]
     }
 
     fn build_qr_code_from_pattern(pattern: Vec<Vec<u8>>) -> QRCode {
